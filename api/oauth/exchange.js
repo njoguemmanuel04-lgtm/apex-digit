@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Method not allowed." });
   }
 
   try {
@@ -8,62 +8,62 @@ export default async function handler(req, res) {
 
     if (!code || !verifier) {
       return res.status(400).json({
-        error: "Missing authorization code or verifier."
+        error: "Missing authorization code or PKCE verifier."
       });
     }
 
     const clientId = process.env.DERIV_CLIENT_ID;
-    const clientSecret = process.env.DERIV_CLIENT_SECRET;
 
-    if (!clientId || !clientSecret) {
+    if (!clientId) {
       return res.status(500).json({
-        error: "Deriv OAuth environment variables are not configured."
+        error: "DERIV_CLIENT_ID is not configured."
       });
     }
+
+    const redirectUri = "https://apex-digit.vercel.app/callback";
 
     const body = new URLSearchParams({
       grant_type: "authorization_code",
       client_id: clientId,
-      client_secret: clientSecret,
       code: code,
       code_verifier: verifier,
-      redirect_uri: "https://apex-digit.vercel.app/callback"
+      redirect_uri: redirectUri
     });
 
-    const response = await fetch(
+    const tokenResponse = await fetch(
       "https://auth.deriv.com/oauth2/token",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: body.toString()
+        body
       }
     );
 
-    const data = await response.json();
+    const data = await tokenResponse.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({
-        error: data.error_description || data.error || "OAuth exchange failed."
+    if (!tokenResponse.ok || !data.access_token) {
+      return res.status(400).json({
+        error: data.error || "Token exchange failed.",
+        details: data.error_description || null
       });
     }
 
-    const token = data.access_token;
-    const expiresIn = Number(data.expires_in || 3600);
+    const maxAge = Number(data.expires_in || 3600);
 
     res.setHeader(
       "Set-Cookie",
-      `deriv_access_token=${encodeURIComponent(token)}; Max-Age=${expiresIn}; Path=/; HttpOnly; Secure; SameSite=Lax`
+      `deriv_access_token=${encodeURIComponent(data.access_token)}; Max-Age=${maxAge}; Path=/; HttpOnly; Secure; SameSite=Lax`
     );
 
     return res.status(200).json({
       connected: true
     });
-
   } catch (error) {
     return res.status(500).json({
-      error: "Server error during Deriv connection."
+      error: "OAuth exchange failed.",
+      details: error.message
     });
   }
 }
