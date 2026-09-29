@@ -1,194 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>APEX DIGITS V2 - LIVE TRADING</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:white;font-family:system-ui;max-width:430px;margin:0 auto;padding:10px;padding-bottom:80px}
+body{background:#0a0a0a;color:white;font-family:system-ui;padding:10px}
 .top{display:flex;gap:8px}
-.balance{flex:1;background:#00ff66;color:black;border-radius:18px;padding:12px;text-align:center;font-weight:900;font-size:17px}
-.signup{background:#ffcc00;color:black;border-radius:18px;padding:12px 16px;font-weight:900;cursor:pointer}
+.balance{flex:1;background:#00ff66;color:black;border-radius:12px;padding:10px;font-weight:900}
+.signup{background:#ffcc00;color:black;border:0;border-radius:12px;padding:10px 16px;font-weight:900}
 .row{display:flex;gap:8px;margin-top:10px}
-.box{flex:1;border-radius:16px;padding:10px}
-.sl{background:#1a0000;border:2px solid #ff0000}
-.tp{background:#001a00;border:2px solid #00cc66}
-.box b{display:block;font-size:14px;margin-bottom:6px}
-.ctrl{display:flex;align-items:center;justify-content:space-between}
-.ctrl button{width:42px;height:42px;border-radius:12px;border:none;font-size:20px;font-weight:900;cursor:pointer}
+.box{flex:1;border-radius:16px;padding:10px;text-align:center;font-weight:900}
+.sl{background:#1a0000;border:2px solid #ff0044;color:#ff0044}
+.tp{background:#001a00;border:2px solid #00ff66;color:#00ff66}
+.box b{display:block;font-size:14px;margin-bottom:4px}
+.ctrl{display:flex;align-items:center;justify-content:space-between;background:#1a1a1a;padding:8px;border-radius:12px;margin-top:8px}
+.ctrl button{width:42px;height:42px;border:0;border-radius:10px;font-size:20px;font-weight:900}
 .ctrl div{font-weight:900;font-size:22px}
-.auto{margin-top:10px;background:#00ff66;color:black;border-radius:16px;padding:12px;text-align:center;font-weight:900;border:2px solid white;cursor:pointer}
-.info{margin-top:10px;background:#111;border-radius:12px;padding:10px;font-size:13px;line-height:1.4}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
-.digit{border-radius:16px;padding:12px 2px;text-align:center;background:#1a1a1a;border:1px solid #333;position:relative}
-.digit.hot{background:#00ff66;color:black;border:3px solid white}
-.digit.cold{background:#1a1a1a;border:2px solid #ff0000}
+.auto{margin-top:10px;background:#00ff66;color:black;padding:14px;border-radius:20px;text-align:center;font-weight:900;font-size:16px;border:0;width:100%}
+.info{margin-top:10px;background:#111;border:1px solid #333;border-radius:12px;padding:10px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.digit{border-radius:16px;padding:12px 2px;text-align:center;background:#111;border:2px solid #333}
+.digit.hot{background:#00ff66;color:black;border-color:#00ff66}
+.digit.cold{background:#1a1a1a;border:2px solid #333;opacity:.6}
 .digit b{font-size:22px;display:block}
-.bot{margin-top:10px;background:#111;border-radius:16px;padding:12px;display:flex;justify-content:space-between;align-items:center}
-.fire{font-weight:900;padding:10px 18px;border-radius:12px;border:none;color:black;cursor:pointer;min-width:70px}
-.fire.active{background:#ff0000!important;color:white;animation:pulse 1s infinite}
-@keyframes pulse{0%{opacity:1}50%{opacity:0.6}100%{opacity:1}}
-.log{background:#000;border-radius:12px;padding:10px;margin-top:10px;max-height:180px;overflow:auto;font-size:11px;font-family:monospace}
-.stakebar{display:flex;gap:8px;margin-top:10px}
-.stakebar div{flex:1;background:#222;border-radius:10px;padding:8px;text-align:center;font-size:12px}
+.bot{margin-top:10px;background:#111;border:1px solid #333;border-radius:16px;padding:12px;display:flex;justify-content:space-between;align-items:center}
 </style>
 </head>
 <body>
-
 <div class="top">
-<div class="balance" id="bal">✅ DEMO $1118.78 - TAP SIGN UP</div>
-<div class="signup" onclick="login()">📝 SIGN UP</div>
+<div class="balance" id="bal">Bal: $0.00</div>
+<button class="signup" onclick="login()">📝 SIGN UP</button>
 </div>
-
 <div class="row">
-<div class="box sl">
-<b style="color:#ff0000">🛑 STOP LOSS</b>
-<div class="ctrl"><button onclick="chgSL(-1)" style="background:#333;color:white">-</button><div style="color:#ff3333" id="sl">$20</div><button onclick="chgSL(1)" style="background:#cc0000;color:white">+</button></div>
-<div style="font-size:11px;opacity:0.6;margin-top:4px">Auto stop if loss <span id="sltxt">-$20</span></div>
+<div class="box sl"><b>- $20</b>Auto stop if loss -$20</div>
+<div class="box tp"><b>+ $50</b>Auto stop if profit +$50</div>
 </div>
-<div class="box tp">
-<b style="color:#00ff88">🎯 TAKE PROFIT</b>
-<div class="ctrl"><button onclick="chgTP(-1)" style="background:#333;color:white">-</button><div style="color:#00ff88" id="tp">$50</div><button onclick="chgTP(1)" style="background:#00cc66;color:white">+</button></div>
-<div style="font-size:11px;opacity:0.6;margin-top:4px">Auto stop if profit +<span id="tptxt">$50</span></div>
+<button class="auto" id="autoBtn" onclick="toggleAuto()">⏸️ AUTO OFF | Session +0.00 | Bal 0.00</button>
+<div class="row">
+<div class="box" style="background:#222">Stake: $<span id="stake">0.35</span></div>
+<div class="box" style="background:#222">Profit: <span id="profit" style="color:#00ff66">+0.00</span></div>
+<div class="box" style="background:#222">Martingale: <span id="mart">1x</span></div>
 </div>
-</div>
-
-<div class="auto" id="autobar" onclick="toggleAuto()">⏸️ AUTO OFF | Session +0.00 | Bal 0.00</div>
-
-<div class="stakebar">
-<div>Stake: $<span id="stake">0.35</span></div><div>Profit: <span id="profit" style="color:#00ff66">+0.00</span></div><div>Martingale: <span id="marti">1x</span></div>
-</div>
-
-<div class="info">
-<div style="color:#00ff88">Ticks <span id="tick">-</span> | Active: <span id="active">NONE</span> | Last100: <span id="l100">0</span> | WS: <span id="wsstat" style="color:yellow">OFF</span></div>
-<div id="loginmsg" style="color:#ffcc00;font-weight:800;font-size:14px">Please TAP SIGN UP to LOGIN to Deriv</div>
-<div style="color:#888;font-size:12px">SL:<span id="slinfo">0.00/-$20</span> TP:<span id="tpinfo">0.00/$50</span> | Last digit: <b id="lastdigit" style="color:white">-</b></div>
-</div>
-
-<div class="grid" id="digitGrid"></div>
+<div class="info" id="info">Ticks - | Active: NONE | Last100: 0 | WS: OFF<br><span style="color:yellow;font-weight:900">Please TAP SIGN UP to LOGIN to Deriv</span><br>SL:0.00/-$20 TP:0.00/$50 | Last digit: -</div>
+<div class="grid" id="grid"></div>
 <div id="bots"></div>
-<div class="log" id="log">🚀 APEX V2 Ready... Waiting for login...</div>
-
+<div style="margin-top:10px;background:#111;border-radius:10px;padding:10px;font-family:monospace;font-size:12px" id="log">🚀 APEX V2 Ready... Waiting for login...</div>
 <script>
 const APP_ID="34qyJGBERhw2zjIw8hKtD";
-let balance=0, sl=20, tp=50, isAuto=false, last=[], counts=Array(10).fill(0), active="NONE", ws=null, token=null, stake=0.35, baseStake=0.35, sessionProfit=0, martiStep=0, isTrading=false, lastBuyDigit=null;
-
-const $ = id => document.getElementById(id);
-function log(m){ $("log").innerHTML = `<div>${new Date().toLocaleTimeString()} - ${m}</div>` + $("log").innerHTML; }
-function login(){ location.href=`https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}`; }
-function chgSL(d){ sl=Math.max(1,sl+d); $("sl").innerText="$"+sl; $("sltxt").innerText="-$"+sl; updateSLTP(); }
-function chgTP(d){ tp=Math.max(1,tp+d); $("tp").innerText="$"+tp; $("tptxt").innerText="$"+tp; updateSLTP(); }
-function updateSLTP(){ $("slinfo").innerText=`${sessionProfit.toFixed(2)}/-$${sl}`; $("tpinfo").innerText=`${sessionProfit.toFixed(2)}/$${tp}`; }
-function toggleAuto(){ isAuto=!isAuto; $("autobar").innerText=(isAuto?"▶️ AUTO ON":"⏸️ AUTO OFF")+` | Session ${sessionProfit>=0?'+':''}${sessionProfit.toFixed(2)} | Bal ${balance.toFixed(2)}`; $("autobar").style.background=isAuto?"#ffcc00":"#00ff66"; if(isAuto && active!=="NONE") log(`⚡ AUTO ON - ${active} will trade auto`); }
-
+const REDIRECT="https://apex-digit.vercel.app/callback.html";
+let token=localStorage.getItem("deriv_token")||"",ws,balance=0,last100=[],digits={},stake=0.35,session=0,auto=false;
+function login(){location.href=`https://oauth.deriv.com/oauth2/authorize?app_id=${APP_ID}&l=EN&brand=deriv&redirect_uri=${REDIRECT}`;}
+function toggleAuto(){auto=!auto;document.getElementById("autoBtn").innerText=(auto?"▶️ AUTO ON":"⏸️ AUTO OFF")+` | Session ${session>=0?"+":""}${session.toFixed(2)} | Bal ${balance.toFixed(2)}`;}
 function renderDigits(){
- let h=""; for(let i=0;i<10;i++){ let c=last.filter(x=>x===i).length; let p=last.length?Math.round(c/last.length*100):0; let isHot = last.length>=10 && c >= Math.max(...counts); let isCold = last.length>=20 && c==0; let lastSeen = last.indexOf(i); if(lastSeen===-1) lastSeen=100;
- h+=`<div class="digit ${isHot?'hot':''} ${isCold?'cold':''}"><b>${i}</b><div style="font-size:12px">${p}%</div><div style="font-size:11px;color:${isHot?'black':'#00ff88'};font-weight:800">${c}M</div><div style="font-size:10px;opacity:0.6">${lastSeen===-1||lastSeen>=99?'100+':lastSeen} ago</div>${isHot?'<div>👑</div>':''}</div>`;
- } $("digitGrid").innerHTML=h;
+let g=document.getElementById("grid");g.innerHTML="";
+for(let i=0;i<10;i++){
+let c=digits[i]||{count:0,last:999},pct=last100.length?Math.round((c.count/last100.length)*100):0;
+let hot=Object.values(digits).sort((a,b)=>b.count-a.count)[0];let isHot=hot&&c.count==hot.count&&c.count>0;
+g.innerHTML+=`<div class="digit ${isHot?"hot":""}"><b>${i}</b>${pct}%<br><span style="color:#00ff66;font-size:11px">${c.count}M</span><br><span style="font-size:10px">${c.last>100?"100+":c.last} ago</span></div>`;
 }
-
-function renderBots(){
- const stats = { even: last.filter(d=>d%2===0).length, odd: last.filter(d=>d%2===1).length, over: last.filter(d=>d>4).length, under: last.filter(d=>d<5).length };
- const evenPct = last.length?Math.round(stats.even/last.length*100):0;
- const oddPct = last.length?Math.round(stats.odd/last.length*100):0;
- const overPct = last.length?Math.round(stats.over/last.length*100):0;
- const underPct = last.length?Math.round(stats.under/last.length*100):0;
- // Coldest digit
- let coldest=0, min=999; for(let i=0;i<10;i++){ if(counts[i]<min){min=counts[i]; coldest=i; } }
- const bots=[
-  {id:"MATCHES", name:"MATCHES Kingpin 1", sub:`${counts[coldest]}M HOT | Coldest:${coldest}(${min}M)`, col:"#00ff66", br:"#00ff66", icon:"🤖 "},
-  {id:"EVEN", name:"EVEN Bot", sub:`${evenPct}% EVEN | ${evenPct>55?'HOT':'Normal'}`, col:"#6da8ff", br:"#3b82ff", icon:""},
-  {id:"ODD", name:"ODD Bot", sub:`${oddPct}% ODD | ${oddPct>55?'HOT':'Normal'}`, col:"#ff9a42", br:"#ff7a00", icon:""},
-  {id:"OVER", name:"OVER/UNDER Bot", sub:`OVER ${overPct}% UNDER ${underPct}%`, col:"#ffdd57", br:"#ffcc00", icon:""},
- ];
- $("bots").innerHTML=bots.map(b=>{
-   let isActive = active===b.id;
-   return `<div class="bot" style="border:2px solid ${b.br}"><div><div style="font-weight:900">${b.icon}${b.name} ${isActive?'🔥 FIRE ON':'🟢 WAIT'}</div><div style="font-size:12px;opacity:0.7">${b.name.includes('MATCHES')?'👑 ':''}${b.sub}</div></div><button class="fire ${isActive?'active':''}" style="background:${b.col}" onclick="fire('${b.id}')">${isActive?'STOP':'FIRE'}</button></div>`;
- }).join("");
+let html="";
+let hotDigit=Object.keys(digits).reduce((a,b)=>digits[a]&&digits[b]&&digits[a].count>digits[b].count?a:b,0);
+html+=`<div class="bot" style="border-color:#00ff66"><div>🤖 MATCHES Kingpin 1 🟢 WAIT<br><small>${digits[hotDigit]?digits[hotDigit].count:0}M HOT | Coldest:${Object.keys(digits).reduce((a,b)=>digits[a]&&digits[b]&&digits[a].last>digits[b].last?a:b,0)}(0M)</small></div><button style="background:#00ff66;border:0;padding:10px 20px;border-radius:12px;font-weight:900" onclick="fire('${hotDigit}')">FIRE</button></div>`;
+html+=`<div class="bot" style="border-color:#4488ff"><div>EVEN Bot 🟢 WAIT<br><small>0% EVEN | Normal</small></div><button style="background:#88bbff;border:0;padding:10px 20px;border-radius:12px;font-weight:900">FIRE</button></div>`;
+html+=`<div class="bot" style="border-color:#ff8844"><div>ODD Bot 🟢 WAIT<br><small>0% ODD | Normal</small></div><button style="background:#ffaa66;border:0;padding:10px 20px;border-radius:12px;font-weight:900">FIRE</button></div>`;
+html+=`<div class="bot" style="border-color:#ffcc00"><div>OVER/UNDER Bot 🟢 WAIT<br><small>OVER 0% UNDER 0%</small></div><button style="background:#ffdd55;border:0;padding:10px 20px;border-radius:12px;font-weight:900">FIRE</button></div>`;
+document.getElementById("bots").innerHTML=html;
 }
-
-function fire(id){
- if(active===id){ active="NONE"; isTrading=false; $("active").innerText="NONE"; log(`🛑 STOPPED ${id}`); renderBots(); return; }
- active=id; $("active").innerText=id; log(`🔥 FIRED ${id} - Ready to trade! Stake $${stake}`); renderBots();
- if(!token){ alert("Please LOGIN first! Tap SIGN UP"); login(); return; }
- if(isAuto) startTrading();
- else { // manual one trade
-   placeTrade();
- }
+function connect(){
+if(!token){renderDigits();return;}
+ws=new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
+ws.onopen=()=>{ws.send(JSON.stringify({authorize:token}));};
+ws.onmessage=(e)=>{
+let d=JSON.parse(e.data);
+if(d.authorize){balance=parseFloat(d.authorize.balance);document.getElementById("bal").innerText=`Bal: $${balance.toFixed(2)}`;ws.send(JSON.stringify({ticks:"R_100",subscribe:1}));ws.send(JSON.stringify({balance:1,subscribe:1}));}
+if(d.tick){let last=d.tick.quote.toFixed(2).slice(-1);last100.unshift(parseInt(last));if(last100.length>100)last100.pop();for(let i=0;i<10;i++)if(!digits[i])digits[i]={count:0,last:0};Object.keys(digits).forEach(k=>digits[k].last++);if(!digits[last])digits[last]={count:0,last:0};digits[last].count++;digits[last].last=0;document.getElementById("info").innerHTML=`Ticks ${d.tick.quote} | Active: R_100 | Last100: ${last100.length} | WS: <span style="color:#00ff66">LIVE ✅</span><br>SL:${session.toFixed(2)}/-$20 TP:${session.toFixed(2)}/$50 | Last digit: ${last}`;renderDigits();}
+if(d.balance){balance=parseFloat(d.balance.balance);document.getElementById("bal").innerText=`Bal: $${balance.toFixed(2)}`;}
+};
+ws.onclose=()=>{document.getElementById("info").innerHTML+=` | WS: <span style="color:red">OFF</span>`;setTimeout(connect,3000);};
 }
-
-function startTrading(){
- if(isTrading) return;
- isTrading=true;
- log(`🤖 AUTO TRADING STARTED for ${active}`);
- const loop = setInterval(()=>{
-   if(!isAuto || active==="NONE" ||!isTrading){ clearInterval(loop); isTrading=false; log("⏸️ Auto stopped"); return; }
-   if(sessionProfit <= -sl){ log(`🛑 STOP LOSS HIT -$${sl} - Stopping`); isAuto=false; toggleAuto(); clearInterval(loop); return; }
-   if(sessionProfit >= tp){ log(`🎯 TAKE PROFIT HIT +$${tp} - Stopping`); isAuto=false; toggleAuto(); clearInterval(loop); return; }
-   placeTrade();
- }, 3500);
-}
-
-function placeTrade(){
- if(!ws || ws.readyState!==1) return;
- let contract_type="", barrier=null;
- const coldest = counts.indexOf(Math.min(...counts));
- const lastDigit = last[0]?? 0;
- if(active==="MATCHES"){ contract_type="DIGITMATCH"; barrier=coldest; lastBuyDigit=coldest; }
- else if(active==="EVEN"){ contract_type="DIGITEVEN"; }
- else if(active==="ODD"){ contract_type="DIGITODD"; }
- else if(active==="OVER"){
-   // decide over or under based on stats
-   const over = last.filter(d=>d>4).length;
-   contract_type = over < 50? "DIGITOVER" : "DIGITUNDER";
-   barrier = 4;
- }
-
- const params = { amount: stake, basis:"stake", contract_type, symbol:"R_100", duration:1, duration_unit:"t", currency:"USD" };
- if(barrier!==null) params.barrier = barrier;
-
- log(`📤 BUY ${contract_type} ${barrier!==null?'['+barrier+']':''} Stake $${stake}`);
- ws.send(JSON.stringify({ buy:1, price: stake, parameters: params }));
-}
-
-function connect(tok){
- token=tok;
- $("wsstat").innerText="CONNECTING...";
- ws=new WebSocket(`wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`);
- ws.onopen=()=>{ $("wsstat").innerText="AUTH..."; ws.send(JSON.stringify({authorize:tok})); };
- ws.onmessage=(e)=>{
-  const d=JSON.parse(e.data);
-  if(d.error){ log(`❌ ${d.error.message}`); $("wsstat").innerText="ERROR"; return; }
-  if(d.authorize){
-   balance=d.authorize.balance; $("bal").innerText=`✅ ${d.authorize.loginid} $${balance.toFixed(2)}`; $("loginmsg").innerText=`CONNECTED - ${d.authorize.loginid} - ${d.authorize.currency} - ${d.msg_type}`; $("wsstat").innerText="LIVE ✅"; $("wsstat").style.color="#00ff66"; log(`✅ CONNECTED ${d.authorize.loginid} Balance $${balance}`); ws.send(JSON.stringify({ticks:"R_100", subscribe:1})); ws.send(JSON.stringify({balance:1, subscribe:1}));
-  }
-  if(d.tick){
-   const q=d.tick.quote; const dig=Number(String(q).slice(-1)); $("tick").innerText=q; $("lastdigit").innerText=dig; last=[dig,...last].slice(0,100); $("l100").innerText=last.length; counts[dig]++; renderDigits(); renderBots();
-  }
-  if(d.balance){ balance=d.balance.balance; $("bal").innerText=`✅ $${balance.toFixed(2)}`; $("autobar").innerText=`${isAuto?"▶️ AUTO ON":"⏸️ AUTO OFF"} | Session ${sessionProfit>=0?'+':''}${sessionProfit.toFixed(2)} | Bal ${balance.toFixed(2)}`; }
-  if(d.buy){ log(`✅ BOUGHT ID:${d.buy.contract_id} @ $${d.buy.buy_price}`); }
-  if(d.proposal_open_contract){
-   const c=d.proposal_open_contract;
-   if(c.is_sold){
-     const profit=Number(c.profit); sessionProfit+=profit; const isWin=profit>0;
-     log(`${isWin?'💚 WIN':'💔 LOSS'} ${c.contract_type} Profit ${profit>0?'+':''}${profit.toFixed(2)} | Session ${sessionProfit.toFixed(2)}`);
-     $("profit").innerText=(sessionProfit>=0?'+':'')+sessionProfit.toFixed(2); $("profit").style.color=sessionProfit>=0?"#00ff66":"#ff4444";
-     if(isWin){ martiStep=0; stake=baseStake; } else { martiStep++; stake=+(baseStake * Math.pow(2.1, martiStep)).toFixed(2); if(stake>10) stake=baseStake; }
-     $("stake").innerText=stake; $("marti").innerText=martiStep+"x";
-     updateSLTP();
-   }
-  }
- };
- ws.onerror=()=>{ $("wsstat").innerText="ERROR ❌"; log("❌ WS Error"); };
- ws.onclose=()=>{ $("wsstat").innerText="CLOSED"; log("🔌 WS Closed - Reconnecting..."); setTimeout(()=>connect(token),3000); };
-}
-
-(function(){
- const p=new URLSearchParams(location.search);
- const t=p.get("token1") || p.get("token") || localStorage.getItem("deriv_token");
- if(t){ localStorage.setItem("deriv_token",t); connect(t); history.replaceState({}, "", "/"); }
- renderDigits(); renderBots();
-})();
+function fire(d){document.getElementById("log").innerText=`🔥 FIRING DIGIT ${d} | Stake $${stake} | Bal $${balance.toFixed(2)}`;}
+if(token)document.querySelector(".signup").innerText="✅ LOGGED IN";
+connect();renderDigits();
 </script>
 </body>
 </html>
