@@ -1,9 +1,28 @@
 <!DOCTYPE html>
-<html><body style="background:#0a0a0a;color:white;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui">
-Connecting APEX... 
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="background:#0a0a0a;color:#00ff66;display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace">
+<h2>✅ LOGIN SUCCESS... REDIRECTING...</h2>
 <script>
-const p=location.search;
-if(p.includes("token")){ localStorage.setItem("deriv_token", new URLSearchParams(p).get("token1")); location.href="/"+p; }
-else{ location.href="/"; }
+(function(){
+const p=new URLSearchParams(location.search);
+const hash=new URLSearchParams(location.hash.slice(1));
+const all=[...p.entries(),...hash.entries()];
+let token="";
+for(let [k,v] of all){
+if(v&&v.includes("-")&&v.length>10){token=v;break;}
+if(k.startsWith("acct")&&v){token=v;break;}
+if(k=="token1"||k=="token"){token=v;break;}
+}
+if(!token){
+for(let v of p.values()){if(v&&v.length>15){token=v;break;}}
+}
+if(token){
+localStorage.setItem("deriv_token",token);
+document.body.innerHTML="<h2>✅ SAVED! GOING TO BOT...</h2>";
+setTimeout(()=>location.href="/",600);
+}else{
+document.body.innerHTML="<h2 style='color:red'>❌ NO TOKEN FOUND<br><small>"+location.search+"</small><br><a href='/'>Go Back</a></h2>";
+}
+})();
 </script>
 </body></html>
